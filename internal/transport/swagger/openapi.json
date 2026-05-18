@@ -1,0 +1,280 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Service API",
+    "version": "1.0.0.0",
+    "description": "CRUD API for tasks built with clean architecture."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Department",
+      "description": "Operations with Department"
+    },
+    {
+      "name": "Employee",
+      "description": "Operations with Employee"
+    }
+  ],
+  "paths": {
+    "/departments/": {
+      "post": {
+        "tags": ["Department"],
+        "summary": "Create department",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateDepartmentRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created department",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Department" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/departments/{id}/employees/": {
+      "post": {
+        "tags": ["Employee"],
+        "summary": "Create employee",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64", "minimum": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateEmployeeRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created employee",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Department" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/departments/{id}": {      
+      "get": {
+        "tags": ["Department"],
+        "summary": "Get department by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64", "minimum": 1}
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 5, "default": 1 }
+          },
+          {
+            "name": "include_employees",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "boolean", "default": false }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Department",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Department" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch":{
+        "tags": ["Department"],
+        "summary": "Move department by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64", "minimum": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/MoveDepartmentRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Department",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Department" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["Department"],
+        "summary": "Delete department",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64", "minimum": 1}
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string", "default": "cascade" }
+          },
+          {
+            "name": "reassign_to_department_id",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": 1 }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "BadRequest": {
+        "description": "Bad request",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Department":{
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Department_name"
+          },
+          "parent_id": {
+            "type": "integer",
+            "example": "1"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-03-24T00:00:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-03-24T00:00:00Z"
+          }
+        }
+      },
+      "CreateDepartmentRequest": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Department_name"
+          },
+          "parent_id": {
+            "type": "integer",
+            "example": "1"
+          }
+        }
+      },
+      "CreateEmployeeRequest": {
+        "type": "object",
+        "required": ["full_name", "position"],
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "example": "Department_name"
+          },
+          "position": {
+            "type": "string",
+            "example": "manager"
+          },
+          "hired_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-03-24T00:00:00Z"
+          }
+        }
+      },
+      "MoveDepartmentRequest":{
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Department_name"
+          },
+          "parent_id": {
+            "type": "integer",
+            "example": "1"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string", "example": "Not found" }
+        }
+      }
+    }
+  }
+}
